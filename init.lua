@@ -81,6 +81,13 @@ require('packer').startup(function()
   -- vim-airline-themes plugin (optional)
   use 'vim-airline/vim-airline-themes'
   use {'nvim-telescope/telescope-ui-select.nvim' }
+  use {
+  'linux-cultist/venv-selector.nvim',
+  requires = { 'neovim/nvim-lspconfig', 'nvim-telescope/telescope.nvim' },
+  config = function()
+    require('venv-selector').setup()
+  end
+}
 end)
 
 -- Gruvbox theme setup
@@ -99,10 +106,10 @@ require("telescope").setup {
 -- load_extension, somewhere after setup function:
 require("telescope").load_extension("ui-select")
 
--- LSP setup for Rust
 local lspconfig = require('lspconfig')
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
+-- LSP setup for zig
 lspconfig.zls.setup{
   capabilities = capabilities, -- Enables LSP autocompletion
   on_attach = function(client, bufnr)
@@ -123,7 +130,7 @@ lspconfig.zls.setup{
 
 }
 
--- Example for Rust
+-- LSP for Rust
 lspconfig.rust_analyzer.setup {
   capabilities = capabilities, -- Enables LSP autocompletion
   on_attach = function(client, bufnr)
@@ -146,6 +153,22 @@ lspconfig.rust_analyzer.setup {
 -- Example for Python
 lspconfig.pyright.setup {
   capabilities = capabilities, -- Enables LSP autocompletion
+  on_attach = function(client, bufnr)
+    if client.server_capabilities.documentFormattingProvider then
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        group = vim.api.nvim_create_augroup("Format", { clear = true }),
+        buffer = bufnr,
+        callback = function() vim.lsp.buf.format({ bufnr = bufnr }) end
+      })
+    end
+    -- Add additional LSP keymaps here if needed
+    local opts = { noremap=true, silent=true, buffer=bufnr }
+    vim.keymap.set('n', '<leader>cd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', '<leader>cn', vim.lsp.buf.rename, opts)
+    vim.keymap.set('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, silent = true })
+  end
+
 }
 
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
@@ -233,3 +256,5 @@ vim.keymap.set('n', '<leader>w1', ':only<CR>', { noremap = true, silent = true})
 vim.keymap.set('n', '<leader><leader>', window.pick, {desc = 'nvim-window: Jump to window'} )
 vim.keymap.set('n', '<leader>gs', neogit.open, {desc = 'open git status'} )
 vim.keymap.set('n', '<leader>r', ':source $MYVIMRC<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>en', vim.diagnostic.goto_next, { desc = "Go to next diagnostic" })
+vim.keymap.set('n', '<leader>ep', vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic" })
