@@ -88,11 +88,27 @@ require('packer').startup(function()
     require('venv-selector').setup()
   end
 }
+  use {
+    'nvim-treesitter/nvim-treesitter',
+    run = ':TSUpdate'
+  }
 end)
 
 -- Gruvbox theme setup
 vim.cmd('colorscheme gruvbox')
 
+
+
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = { "rust", "lua", "python", "javascript", "typescript" }, -- List of languages to install
+  highlight = {
+    enable = true,              -- Enable syntax highlighting
+    additional_vim_regex_highlighting = false,
+  },
+  indent = {
+    enable = true,              -- Enable indentation based on syntax
+  },
+}
 -- lsp code action 
 -- This is your opts table
 require("telescope").setup {
