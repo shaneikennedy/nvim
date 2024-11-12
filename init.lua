@@ -16,8 +16,10 @@ require('packer').startup(function()
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
-  -- Gruvbox theme
+
+  -- Themes
   use 'morhetz/gruvbox'
+  use 'projekt0n/github-nvim-theme'
 
   -- LSP configuration and Rust support
   use 'neovim/nvim-lspconfig' -- LSP configurations
@@ -82,22 +84,29 @@ require('packer').startup(function()
   use 'vim-airline/vim-airline-themes'
   use {'nvim-telescope/telescope-ui-select.nvim' }
   use {
-  'linux-cultist/venv-selector.nvim',
-  requires = { 'neovim/nvim-lspconfig', 'nvim-telescope/telescope.nvim' },
-  config = function()
-    require('venv-selector').setup()
-  end
-}
+    'linux-cultist/venv-selector.nvim',
+    requires = { 'neovim/nvim-lspconfig', 'nvim-telescope/telescope.nvim' },
+    config = function()
+      require('venv-selector').setup()
+    end
+  }
+
   use {
     'nvim-treesitter/nvim-treesitter',
     run = ':TSUpdate'
   }
+
+  use {
+    "kylechui/nvim-surround", 
+    tag = "*", -- Use for stability; omit to use `main` branch for the latest features
+    config = function()
+      require("nvim-surround").setup()
+    end
+  }
 end)
 
--- Gruvbox theme setup
-vim.cmd('colorscheme gruvbox')
-
-
+-- Theme setup
+vim.cmd('colorscheme github_dark')
 
 require'nvim-treesitter.configs'.setup {
   ensure_installed = { "rust", "lua", "python", "javascript", "typescript" }, -- List of languages to install
